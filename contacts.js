@@ -2,40 +2,66 @@ const fs = require("fs/promises");
 const path = require("path");
 const crypto = require("crypto");
 
-const contactsPath = "./db/contacts.json";
+const contactsPath = path.join(__dirname, "/db/contacts.json");
 
-const readContacts = async () => {
-  const result = await fs.readFile(
-    path.join(__dirname, "contacts.json"),
-    "utf8"
-  );
-  const contacts = JSON.parse(result);
-  return contacts;
-};
-
-function listContacts() {
-  return readContacts();
+async function getContacts() {
+  try {
+    const data = await fs.readFile(contactsPath, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    console.error();
+  }
 }
 
-function getContactById(contactId) {
-  const contacts = await readContacts();
-  const [result] = contacts.filter((contact) => contact.id === contactId);
-  return result;
+async function listContacts() {
+  try {
+    return getContacts();
+  } catch {
+    console.error();
+  }
 }
 
-function removeContact(contactId) {
-  // ...твой код
+async function getContactById(contactId) {
+  try {
+    const contacts = await getContacts();
+    const [result] = contacts.filter((contact) => contact.id === contactId);
+    return result;
+  } catch {
+    console.error();
+  }
 }
 
-function addContact(name, email, phone) {
-  const contacts = await readContacts();
-  const newContact = { id: crypto.randomUUID(), name, email, phone };
-  contacts.push(newContact);
-  await fs.writeFile(
-    path.join(__dirname, "contacts.json"),
-    JSON.stringify(contacts, null, 2)
-  );
-  return newContact;
+async function removeContact(contactId) {
+  try {
+    const contacts = await getContacts();
+    const contactsFilter = contacts.filter(
+      (contact) => contact.id !== contactId
+    );
+    try {
+      await fs.writeFile(contactsPath, JSON.stringify(contactsFilter, null, 2));
+      return getContacts();
+    } catch {
+      console.error();
+    }
+  } catch {
+    console.error();
+  }
+}
+
+async function addContact(name, email, phone) {
+  try {
+    const contacts = await getContacts();
+    const newContact = { id: crypto.randomUUID(), name, email, phone };
+    contacts.push(newContact);
+    try {
+      await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+      return newContact;
+    } catch {
+      console.error();
+    }
+  } catch {
+    console.error();
+  }
 }
 
 module.exports = {
