@@ -37,12 +37,8 @@ async function removeContact(contactId) {
     const contactsFilter = contacts.filter(
       (contact) => contact.id !== contactId
     );
-    try {
-      await fs.writeFile(contactsPath, JSON.stringify(contactsFilter, null, 2));
-      return getContacts();
-    } catch {
-      console.error();
-    }
+    await fs.writeFile(contactsPath, JSON.stringify(contactsFilter, null, 2));
+    return getContacts();
   } catch {
     console.error();
   }
@@ -53,12 +49,8 @@ async function addContact(name, email, phone) {
     const contacts = await getContacts();
     const newContact = { id: crypto.randomUUID(), name, email, phone };
     contacts.push(newContact);
-    try {
-      await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-      return newContact;
-    } catch {
-      console.error();
-    }
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return newContact;
   } catch {
     console.error();
   }
